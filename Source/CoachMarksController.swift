@@ -556,16 +556,22 @@ public class CoachMarksController: UIViewController, OverlayViewDelegate {
     ///
     /// - Parameter shouldCallDelegate: `true` to call delegate methods, `false` otherwise.
     private func createAndShowCoachMark(shouldCallDelegate shouldCallDelegate: Bool = true) {
-        if changingSize { return }
+        guard !changingSize else { return }
+        guard let
+                dataSource = self.dataSource,
+                delegate = self.delegate
+            else {
+                return
+        }
 
         // Retrieves the current coach mark structure from the datasource.
         // It can't be nil, that's why we'll force unwrap it everywhere.
-        self.currentCoachMark = self.dataSource!.coachMarksController(self, coachMarksForIndex: self.currentIndex)
+        self.currentCoachMark = dataSource.coachMarksController(self, coachMarksForIndex: self.currentIndex)
 
         // The coach mark will soon show, we notify the delegate, so it
         // can perform some things and, if required, update the coach mark structure.
         if shouldCallDelegate {
-            self.delegate?.coachMarksController(self, coachMarkWillShow: &self.currentCoachMark!, forIndex: self.currentIndex)
+            delegate.coachMarksController(self, coachMarkWillShow: &self.currentCoachMark!, forIndex: self.currentIndex)
         }
 
         // The delegate might have paused the flow, he check whether or not it's
